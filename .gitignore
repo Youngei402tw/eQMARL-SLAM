@@ -33,3 +33,6 @@ SLAM/visualization/*
 training.log
 *.o[0-9]*
 *.e[0-9]*
+.claude/sessions/*
+.sandbox-home/.keras/*
+.sandbox-home/.cache/*

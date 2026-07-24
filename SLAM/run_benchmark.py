@@ -819,6 +819,10 @@ def print_configuration(args: argparse.Namespace) -> None:
 
 def run_benchmark(args: argparse.Namespace) -> Path:
     configure_tensorflow()
+    # A temporary seed is required so that Conv2D/kernel random initialisers in
+    # the parameter-count preview (before the real seed_everything call) do not
+    # crash under tf.config.experimental.enable_op_determinism().
+    tf.random.set_seed(1)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     all_training_seeds = set()
     for model_seed in range(
@@ -855,6 +859,28 @@ def run_benchmark(args: argparse.Namespace) -> Path:
     _, map_size = parse_env_id(args.env_id)
     obs_shape = (map_size, map_size, OBS_CHANNELS)
     canonical_actors: Dict[int, tuple[List[np.ndarray], str]] = {}
+
+    # Print parameter count comparison for all requested frameworks
+    print("\nParameter count comparison:", flush=True)
+    print(f"  {'Framework':10s}  {'Actor':>10s}  {'Critic':>10s}  {'Total':>10s}", flush=True)
+    print(f"  {'-'*10}  {'-'*10}  {'-'*10}  {'-'*10}", flush=True)
+    for framework in args.frameworks:
+        if framework_requires_quantum(framework) and not quantum_available:
+            print(f"  {framework:10s}  {'(skipped)':>10s}", flush=True)
+            continue
+        actor_tmp, critic_tmp = create_models(framework, args, obs_shape)
+        actor_params = count_trainable_params(actor_tmp)
+        critic_params = count_trainable_params(critic_tmp)
+        print(
+            f"  {framework:10s}  {actor_params:>10,d}  {critic_params:>10,d}  "
+            f"{actor_params + critic_params:>10,d}",
+            flush=True,
+        )
+        del actor_tmp, critic_tmp
+        keras.backend.clear_session()
+        gc.collect()
+    print(flush=True)
+
     for model_seed in range(
         args.model_seed_start,
         args.model_seed_start + args.n_seeds,

@@ -293,7 +293,10 @@ class _BaseVariationalPQC(keras.layers.Layer):
         self.encoding_scales = self.add_weight(
             name="encoding_scales",
             shape=self._encoding_shape,
-            initializer="ones",
+            initializer=keras.initializers.RandomUniform(
+                minval=0.5,
+                maxval=1.5,
+            ),
             trainable=self.trainable_encoding_scale,
             dtype=tf.float32,
         )

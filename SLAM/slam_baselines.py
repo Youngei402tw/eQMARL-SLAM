@@ -122,11 +122,17 @@ def generate_critic_eqmarl_psi_plus(
     n_layers: int = 5,
     obs_shape: Tuple[int, int, int] = (8, 8, OBS_CHANNELS),
     aux_dim: int = AUX_DIM,
-    local_hidden: int = 32,
+    local_hidden: int = 48,
     squash_activation: str = "atan",
     **kwargs,
 ) -> keras.Model:
-    """eQMARL critic with local encoders and psi+ entangled partitions."""
+    """eQMARL critic with local encoders and psi+ entangled partitions.
+
+    ``local_hidden`` is intentionally smaller than the sCTDE ``local_hidden``
+    (48 < 64) so that the overall parameter count stays well below the
+    classical baselines while the quantum PQC provides additional expressive
+    capacity through entangled observables.
+    """
     try:
         from .quantum_layers import (
             PartiteVariationalPQC,
@@ -190,6 +196,11 @@ def generate_critic_eqmarl_psi_plus(
         activation="tanh",
         name="eqmarl-readout-hidden",
     )(expectations)
+    readout = keras.layers.Dense(
+        4,
+        activation="tanh",
+        name="eqmarl-readout-2",
+    )(readout)
     value = keras.layers.Dense(n_agents, activation=None, name="v")(readout)
     return keras.Model(
         inputs=[image_input, aux_input],
@@ -366,7 +377,7 @@ def get_optimizer_configs(
     framework: str,
     actor_lr: float = 3e-4,
     critic_lr: float = 1e-3,
-    quantum_critic_lr: float = 5e-4,
+    quantum_critic_lr: float = 1e-3,
 ):
     actor_optimizer = keras.optimizers.Adam(learning_rate=float(actor_lr))
     selected_critic_lr = (
