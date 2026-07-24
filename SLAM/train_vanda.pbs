@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N eqmarl_slam_train
+#PBS -l select=1:ncpus=8:ngpus=1:mem=48gb
+#PBS -l walltime=48:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?Submit this job from the repository root}"
+
+CONDA_ENV="${CONDA_ENV:-eqmarl_slam}"
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate "$CONDA_ENV"
+
+python -m SLAM.run_benchmark \
+  --env-id "${SLAM_ENV_ID:-MiniGrid-RandomSLAM-32x32-v0}" \
+  --frameworks eqmarl qfctde sctde fctde \
+  --n-seeds "${SLAM_N_SEEDS:-10}" \
+  --episodes "${SLAM_N_EPISODES:-1000}" \
+  --max-steps "${SLAM_MAX_STEPS:-200}" \
+  --eval-episodes "${SLAM_EVAL_EPISODES:-100}" \
+  --strict-quantum

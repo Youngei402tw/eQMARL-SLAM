@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eqmarl-slam"
+version = "2.0.1"
+description = "Corrected cooperative SLAM benchmark for eQMARL and CTDE critics"
+readme = "README.md"
+requires-python = ">=3.9,<3.10"
+license = {text = "CC-BY-4.0"}
+authors = [{name = "eQMARL-SLAM contributors"}]
+keywords = ["multi-agent reinforcement learning", "SLAM", "quantum machine learning", "CTDE"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=1.19.5,<1.24",
+  "gymnasium>=0.26,<1.0",
+  "tensorflow==2.7.0",
+  "tqdm>=4.60",
+]
+
+[project.optional-dependencies]
+quantum = [
+  "cirq-core==0.13.1",
+  "cirq-google==0.13.1",
+  "sympy==1.8",
+  "protobuf==3.17.3",
+  "googleapis-common-protos==1.52.0",
+  "google-api-core==1.21.0",
+  "google-auth==1.18.0",
+  "tensorflow-quantum==0.7.2",
+]
+analysis = [
+  "matplotlib>=3.4",
+  "pandas>=1.3",
+  "nbformat>=5.1",
+  "jupyter>=1.0",
+]
+test = ["pytest>=7,<9"]
+
+[project.scripts]
+eqmarl-slam-benchmark = "SLAM.run_benchmark:main"
+
+[tool.setuptools.packages.find]
+include = ["SLAM*"]
+
+[tool.pytest.ini_options]
+testpaths = ["SLAM/tests"]
+addopts = "-ra"
+pythonpath = ["."]

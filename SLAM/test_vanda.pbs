@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N eqmarl_slam_test
+#PBS -l select=1:ncpus=4:ngpus=1:mem=24gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+
+set -euo pipefail
+cd "${PBS_O_WORKDIR:?Submit this job from the repository root}"
+
+CONDA_ENV="${CONDA_ENV:-eqmarl_slam}"
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate "$CONDA_ENV"
+
+python -m pytest
+python -m SLAM.smoke_test
+python -m SLAM.run_benchmark \
+  --quick \
+  --env-id MiniGrid-RandomSLAM-6x6-v0 \
+  --frameworks eqmarl qfctde sctde fctde \
+  --strict-quantum \
+  --no-progress

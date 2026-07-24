@@ -1,0 +1,9 @@
+name: eqmarl_slam
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - -e .[quantum,analysis,test]
