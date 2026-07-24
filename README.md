@@ -67,6 +67,32 @@ MiniGrid-RandomSLAM-{6,8,16,32}x{6,8,16,32}-v0
 
 The historical `MiniGrid-...` prefix is retained for compatibility, but MiniGrid itself is no longer required.
 
+## GPU
+
+Verify that an NVIDIA GPU and CUDA drivers are available:
+
+```bash
+nvidia-smi
+```
+
+Example output for this development machine:
+
+```text
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4      |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 4060 ...    Off |   00000000:01:00.0 Off |                  N/A |
+| N/A   46C    P0              3W / 115W |     216MiB /  8192MiB |      1%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+```
+
+The quantum backends (TensorFlow Quantum / Cirq) run on CPU; only the classical actor and critic models benefit from GPU acceleration.
+
 ## Installation
 
 The reference eQMARL software stack pins TensorFlow 2.7.0 and TensorFlow Quantum 0.7.2, so use Python 3.9.
